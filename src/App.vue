@@ -4,8 +4,9 @@
      <div class="header">Мои расходы</div>
    </header>
    <main>
-     <AddPaymentForm @addNewPayment ="addNewPayment" />
-     <PaymentsDisplay :items="paymentsList" />
+     <AddPaymentForm @addNewPayment ="addNewPayment" :categoryList="CategoryList" />
+     <PaymentsDisplay :items="currentElements" />
+     <Pagination :cur="page" :n="n" :length="12" @paginate="changePage" />
    </main>
   </div>
 </template>
@@ -14,43 +15,43 @@
 
 import AddPaymentForm from './components/AddPaymentForm.vue'
 import PaymentsDisplay from './components/PaymentsDisplay.vue'
+import Pagination from './components/Pagination.vue'
 
 export default {
   name: 'App',
   components: {
     AddPaymentForm,
-    PaymentsDisplay
+    PaymentsDisplay,
+    Pagination
   },
   data: () => ({
-    paymentsList: []
+    page: 1,
+    n: 3
   }),
-  methods: {
-    fetchData () {
-      return [
-        {
-          Дата: '28.03.2020',
-          Категория: 'Продукты',
-          Сумма: 169
-        },
-        {
-          Дата: '24.03.2020',
-          Категория: 'Транспорт',
-          Сумма: 360
-        },
-        {
-          Дата: '24.03.2020',
-          Категория: 'Продукты',
-          Сумма: 532
-        }
-      ]
+  computed: {
+    paymentsList () {
+      return this.$store.getters.getPaymentsList
     },
-    addNewPayment (data) {
-      this.paymentsList = [...this.paymentsList, data]
+    CategoryList () {
+      return this.$store.getters.getCategoryList
+    },
+    currentElements () {
+      const { n, page } = this
+      return this.paymentsList.slice(n * (page - 1), n * (page - 1) + n)
     }
-
+  },
+  methods: {
+    addNewPayment (data) {
+      this.$store.commit('addDataToPaymentsList', data)
+    },
+    changePage (p) {
+      this.page = p
+      this.$store.dispatch('fetchData', p)
+    }
   },
   created () {
-    this.paymentsList = this.fetchData()
+    this.$store.dispatch('fetchData', 1)
+    this.$store.dispatch('fetchCategoryList')
   }
 }
 </script>
