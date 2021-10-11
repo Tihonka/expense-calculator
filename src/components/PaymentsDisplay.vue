@@ -2,16 +2,16 @@
   <table>
     <tr>
       <th>#</th>
-      <th>Дата</th>
-      <th>Категория</th>
-      <th>Сумма</th>
+      <th>Date</th>
+      <th>Category</th>
+      <th>Amount</th>
     </tr>
     <tbody>
      <tr v-for="(item, index) in items" :key="index">
-       <td>{{index + 1}}</td>
-       <td>{{ item.Дата }}</td>
-       <td>{{ item.Категория }}</td>
-       <td>{{ item.Сумма }}</td>
+       <td>{{ item.id }}</td>
+       <td>{{ item.date }}</td>
+       <td>{{ item.category }}</td>
+       <td>{{ item.amount }}</td>
       </tr>
     </tbody>
   </table>
