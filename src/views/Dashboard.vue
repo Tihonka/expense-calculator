@@ -3,23 +3,22 @@
     <!-- <header>
      <div class="header">Мои расходы</div>
     </header> -->
-     <AddPaymentForm @addNewPayment ="addNewPayment" :categoryList="CategoryList" />
-     <PaymentsDisplay :items="paymentsList" />
+     <PaymentsDisplay show-items :items="currentElements" />
      <Pagination :cur="page" :n="n" :length="paymentsList.length" @paginate="changePage" />
+     <button @click="addPayment">Add Payment</button>
   </div>
 </template>
 
 <script>
-import AddPaymentForm from '../components/AddPaymentForm.vue'
 import PaymentsDisplay from '../components/PaymentsDisplay.vue'
 import Pagination from '../components/Pagination.vue'
 
 export default {
-  components: { AddPaymentForm, PaymentsDisplay, Pagination },
+  components: { PaymentsDisplay, Pagination },
   name: 'Dashboard',
   data: () => ({
     page: 1,
-    n: 5
+    n: 10
   }),
   computed: {
     paymentsList () {
@@ -34,15 +33,15 @@ export default {
     }
   },
   methods: {
-    addNewPayment (data) {
-      this.$store.commit('addDataToPaymentsList', data)
-    },
     changePage (p) {
       this.page = p
       this.$store.dispatch('fetchData', p)
     },
+    addPayment () {
+      this.$modal.show({ title: 'Add Payment Form', content: 'AddPaymentForm' })
+    },
     async created () {
-      await this.$store.dispatch('fetchData')
+      await this.$store.dispatch('fetchData', 1)
       await this.$store.dispatch('fetchCategoryList')
       if (this.$route.name === 'AddPaymentFromUrl') {
         this.checkUrl()
