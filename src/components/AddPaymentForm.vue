@@ -1,7 +1,6 @@
 <template>
   <div class="form">
       <div class="wrapper">
-    <button class="addCost" @click="show = !show">Add costs</button>
     </div>
      <form action="#" v-show="show">
          <input placeholder="Amount" v-model="amount" />
@@ -23,21 +22,27 @@
 </template>
 <script>
 export default {
-  name: 'AddPaymentForm',
   props: {
-    data: Object,
-    categoryList: {
-      type: Array,
-      default: () => []
-    }
+    settings: Object
   },
+  name: 'AddPaymentForm',
   data () {
-    return {
-      date: '',
-      category: '',
-      amount: '',
-      id: 3,
-      show: false
+    if (!this.settings) {
+      return {
+        date: '',
+        category: '',
+        amount: '',
+        id: 3,
+        show: true
+      }
+    } else {
+      return {
+        date: this.settings.date,
+        category: this.settings.category,
+        amount: this.settings.amount,
+        id: this.settings.id,
+        show: true
+      }
     }
   },
   watch: {
@@ -48,6 +53,9 @@ export default {
     }
   },
   computed: {
+    categoryList () {
+      return this.$store.getters.getCategoryList
+    },
     getCurrentDate () {
       const today = new Date()
       const d = today.getDate()
@@ -58,19 +66,32 @@ export default {
   },
   methods: {
     onSaveClick () {
-      const data = {
-        date: this.date || this.getCurrentDate,
-        category: this.category,
-        amount: +this.amount,
-        id: this.id + 1
+      if (!this.settings) {
+        const data = {
+          date: this.date || this.getCurrentDate,
+          category: this.category,
+          amount: +this.amount,
+          id: this.id + 1
+        }
+        this.id = this.id + 1
+        this.addNewPayment(data)
+      } else {
+        const data = {
+          date: this.date,
+          category: this.category,
+          amount: +this.amount,
+          id: this.id
+        }
+        this.$store.commit('editElement', data)
       }
-      this.id = this.id + 1
-      this.$emit('addNewPayment', data)
     },
     checkUrl () {
       this.amount = this.$route.query.value || ''
       this.category = this.$route.params.category || ''
       this.date = this.date || this.getCurrentDate
+    },
+    addNewPayment (data) {
+      this.$store.commit('addDataToPaymentsList', data)
     },
     created () {
       if (this.data) {
@@ -97,8 +118,8 @@ input {
 }
 
 select {
-width: 220px;
-padding: 8px 0;
+    width: 220px;
+    padding: 8px 0;
 }
 
 .add {
