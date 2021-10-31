@@ -1,17 +1,23 @@
 <template>
   <div class="form">
       <div class="wrapper">
-    <button class="addCost" @click="show = !show">Добавить расходы</button>
+    <button class="addCost" @click="show = !show">Add costs</button>
     </div>
      <form action="#" v-show="show">
-         <input placeholder="Сумма" v-model="Сумма" />
-         <select v-model="Категория">
+         <input placeholder="Amount" v-model="amount" />
+         <select v-model="category">
           <option v-for="option in categoryList" :key="option">
             {{ option }}
           </option>
          </select>
-         <input placeholder="Дата" v-model="Дата" />
-         <button class= "add" @click= "onSaveClick">Сохранить</button>
+         <input placeholder="Date" v-model="date" />
+         <router-link to="/dashboard/add/payment/Sport?value=400">
+      Sport-400</router-link>
+      <router-link to="/dashboard/add/payment/Education?value=500">
+      Education-500</router-link>
+      <router-link to="/dashboard/add/payment/Transport?value=600">
+      Transport-600</router-link>
+         <button class= "add" @click= "onSaveClick">Save</button>
      </form>
   </div>
 </template>
@@ -19,6 +25,7 @@
 export default {
   name: 'AddPaymentForm',
   props: {
+    data: Object,
     categoryList: {
       type: Array,
       default: () => []
@@ -26,20 +33,18 @@ export default {
   },
   data () {
     return {
-      Дата: '',
-      Категория: '',
-      Сумма: '',
+      date: '',
+      category: '',
+      amount: '',
+      id: 3,
       show: false
     }
   },
-  methods: {
-    onSaveClick () {
-      const data = {
-        Дата: this.Дата || this.getCurrentDate,
-        Категория: this.Категория,
-        Сумма: +this.Сумма
+  watch: {
+    $route (to, from) {
+      if (to.name === 'AddPaymentFromUrl') {
+        this.checkUrl()
       }
-      this.$emit('addNewPayment', data)
     }
   },
   computed: {
@@ -50,6 +55,30 @@ export default {
       const y = today.getFullYear()
       return `${d}.${m}.${y}`
     }
+  },
+  methods: {
+    onSaveClick () {
+      const data = {
+        date: this.date || this.getCurrentDate,
+        category: this.category,
+        amount: +this.amount,
+        id: this.id + 1
+      }
+      this.id = this.id + 1
+      this.$emit('addNewPayment', data)
+    },
+    checkUrl () {
+      this.amount = this.$route.query.value || ''
+      this.category = this.$route.params.category || ''
+      this.date = this.date || this.getCurrentDate
+    },
+    created () {
+      if (this.data) {
+        const { amount, category } = this.data
+        this.category = category || ''
+        this.amount = Number(amount) || 0
+      }
+    }
   }
 }
 </script>
@@ -57,6 +86,7 @@ export default {
 form{
     display: flex;
     flex-direction: column;
+    text-align: start;
     gap: 10px;
     margin-bottom: 20px;
 }
