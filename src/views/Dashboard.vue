@@ -1,26 +1,48 @@
 <template>
-  <div>
-    <!-- <header>
-     <div class="header">Мои расходы</div>
-    </header> -->
-     <PaymentsDisplay show-items :items="currentElements" />
-     <Pagination :cur="page" :n="n" :length="paymentsList.length" @paginate="changePage" />
-     <button @click="addPayment">Add Payment</button>
-  </div>
+  <v-container>
+  <v-row>
+    <v-col>
+           <div class="text-h5 text-sm-h3">My personal costs</div>
+    </v-col>
+  </v-row>
+    <v-row>
+      <v-col>
+        <v-dialog v-model="dialog" width="500">
+          <template v-slot:activator="{ on }">
+            <v-btn color="teal" dark v-on="on" @click="dialog=true">Add new cost <v-icon>mdi-plus</v-icon></v-btn>
+          </template>
+          <v-card>
+            <AddPaymentForm />
+          </v-card>
+           <v-btn @click="dialog=false">Close</v-btn>
+        </v-dialog>
+        <PaymentsDisplay show-items :items="currentElements" />
+        <div>
+          <Pagination  @paginate="changePage"/>
+        </div>
+      </v-col>
+      <v-col>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
+import AddPaymentForm from '../components/AddPaymentForm.vue'
 import PaymentsDisplay from '../components/PaymentsDisplay.vue'
 import Pagination from '../components/Pagination.vue'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
-  components: { PaymentsDisplay, Pagination },
+  components: { PaymentsDisplay, AddPaymentForm, Pagination },
   name: 'Dashboard',
   data: () => ({
+    dialog: false,
     page: 1,
-    n: 10
+    n: 4
   }),
   computed: {
+    ...mapGetters(['getPaymentsList']),
     paymentsList () {
       return this.$store.getters.getPaymentsList
     },
@@ -33,6 +55,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      addData: 'setPaymentsListData'
+    }),
     changePage (p) {
       this.page = p
       this.$store.dispatch('fetchData', p)
@@ -40,12 +65,9 @@ export default {
     addPayment () {
       this.$modal.show({ title: 'Add Payment Form', content: 'AddPaymentForm' })
     },
-    async created () {
-      await this.$store.dispatch('fetchData', 1)
-      await this.$store.dispatch('fetchCategoryList')
-      if (this.$route.name === 'AddPaymentFromUrl') {
-        this.checkUrl()
-      }
+    created () {
+      this.$store.dispatch('fetchData')
+      this.$store.dispatch('fetchCategoryList')
     }
   }
 }

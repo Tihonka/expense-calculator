@@ -1,54 +1,32 @@
 <template>
-  <div class="form">
-      <div class="wrapper">
-    </div>
-     <form action="#" v-show="show">
-         <input placeholder="Amount" v-model="amount" />
-         <select v-model="category">
-          <option v-for="option in categoryList" :key="option">
-            {{ option }}
-          </option>
-         </select>
-         <input placeholder="Date" v-model="date" />
-         <router-link to="/dashboard/add/payment/Sport?value=400">
-      Sport-400</router-link>
-      <router-link to="/dashboard/add/payment/Education?value=500">
-      Education-500</router-link>
-      <router-link to="/dashboard/add/payment/Transport?value=600">
-      Transport-600</router-link>
-         <button class= "add" @click= "onSaveClick">Save</button>
-     </form>
-  </div>
+<v-card class="text-left pa-8">
+  <v-text-field v-model="date" label="Date" />
+  <v-select v-model="category" label="Category" :items="categoryList" />
+  <v-text-field v-model="amount" label="Amount" />
+  <v-btn @click="onSaveClick">Save</v-btn>
+</v-card>
 </template>
 <script>
 export default {
   props: {
-    settings: Object
+    settings: Object,
+    item: Object
   },
   name: 'AddPaymentForm',
   data () {
-    if (!this.settings) {
+    if (!this.item) {
       return {
         date: '',
         category: '',
         amount: '',
-        id: 3,
-        show: true
+        id: 6
       }
     } else {
       return {
-        date: this.settings.date,
-        category: this.settings.category,
-        amount: this.settings.amount,
-        id: this.settings.id,
-        show: true
-      }
-    }
-  },
-  watch: {
-    $route (to, from) {
-      if (to.name === 'AddPaymentFromUrl') {
-        this.checkUrl()
+        date: this.item.date,
+        category: this.item.category,
+        amount: this.item.amount,
+        id: this.item.id
       }
     }
   },
@@ -66,7 +44,7 @@ export default {
   },
   methods: {
     onSaveClick () {
-      if (!this.settings) {
+      if (!this.item) {
         const data = {
           date: this.date || this.getCurrentDate,
           category: this.category,
@@ -85,20 +63,8 @@ export default {
         this.$store.commit('editElement', data)
       }
     },
-    checkUrl () {
-      this.amount = this.$route.query.value || ''
-      this.category = this.$route.params.category || ''
-      this.date = this.date || this.getCurrentDate
-    },
     addNewPayment (data) {
       this.$store.commit('addDataToPaymentsList', data)
-    },
-    created () {
-      if (this.data) {
-        const { amount, category } = this.data
-        this.category = category || ''
-        this.amount = Number(amount) || 0
-      }
     }
   }
 }
