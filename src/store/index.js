@@ -28,7 +28,9 @@ export default new Vuex.Store({
       state.paymentsList.push(...newUniqObjs)
     },
     deleteElement (state, payload) {
-      state.paymentsList.splice(payload, 1)
+      const filteredList = state.paymentsList.find(item => item.id === payload)
+      const Position = state.paymentsList.indexOf(filteredList)
+      state.paymentsList.splice(Position, 1)
     },
     editElement (state, payload) {
       const filteredList = state.paymentsList.find(item => item.id === payload.id)
@@ -62,10 +64,28 @@ export default new Vuex.Store({
               date: '24.03.2020',
               category: 'Food',
               amount: 532
+            },
+            {
+              id: 4,
+              date: '28.03.2020',
+              category: 'Food',
+              amount: 169
+            },
+            {
+              id: 5,
+              date: '24.03.2020',
+              category: 'Transport',
+              amount: 360
+            },
+            {
+              id: 6,
+              date: '24.03.2020',
+              category: 'Food',
+              amount: 532
             }
           ]
           )
-        }, 1000)
+        }, 500)
       }).then(res => {
         commit('setPaymentsListData', res)
       })
