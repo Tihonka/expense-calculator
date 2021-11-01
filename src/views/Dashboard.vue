@@ -22,6 +22,10 @@
         </div>
       </v-col>
       <v-col>
+        <div>
+          <h3>Costs by categories</h3>
+        <DoughnutChart :dataChart="setData"></DoughnutChart>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -31,10 +35,11 @@
 import AddPaymentForm from '../components/AddPaymentForm.vue'
 import PaymentsDisplay from '../components/PaymentsDisplay.vue'
 import Pagination from '../components/Pagination.vue'
+import DoughnutChart from '../components/DoughnutChart.vue'
 import { mapMutations, mapGetters } from 'vuex'
 
 export default {
-  components: { PaymentsDisplay, AddPaymentForm, Pagination },
+  components: { PaymentsDisplay, AddPaymentForm, Pagination, DoughnutChart },
   name: 'Dashboard',
   data: () => ({
     dialog: false,
@@ -52,6 +57,20 @@ export default {
     currentElements () {
       const { n, page } = this
       return this.paymentsList.slice(n * (page - 1), n * (page - 1) + n)
+    },
+    setData () {
+      const data = []
+      for (let i = 0; i < this.CategoryList.length; i++) {
+        let sum = 0
+        for (let j = 0; j < this.paymentsList.length; j++) {
+          if (this.CategoryList[i] === this.paymentsList[j].category) {
+            sum += this.paymentsList[j].amount
+          }
+        }
+        data.push(sum)
+      }
+      console.log(data)
+      return data
     }
   },
   methods: {
